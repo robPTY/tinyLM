@@ -6,6 +6,11 @@ TinyGPT_Config = {
     "VOCAB_SIZE": 8000,
     "EMBEDDING_SIZE": 8003,
     "D_MODEL": 512, 
+    "D_FF": 2048,
+    "DROPOUT": 0.2,
+    "N_HEADS": 8,
+    "N_LAYERS": 6,
+    "EPS":  10**-6
 }
 
 # Training Config

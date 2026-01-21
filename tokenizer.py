@@ -1,5 +1,5 @@
 import json
-import pandas as pd 
+import pandas as pd
 from typing import List, Tuple, Dict
 
 class Tokenizer:
@@ -92,8 +92,14 @@ class Tokenizer:
         for (x0, x1), new_id in self.merges.items():
             merges_list.append([x0, x1, new_id])
 
-        data = {"vocab_size": self.vocab_size, "byte_length": self.byte_length, "BOS": self.BOS,
-                "EOS": self.EOS,"merges": merges_list, self.PAD: "PAD"}
+        data = {
+            "vocab_size": self.vocab_size,
+            "byte_length": self.byte_length,
+            "BOS": self.BOS,
+            "EOS": self.EOS,
+            "PAD": self.PAD,
+            "merges": merges_list,
+        }
 
         with open(file_path, 'w') as f:
             json.dump(data, f, indent=2)

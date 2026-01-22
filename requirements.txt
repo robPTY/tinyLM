@@ -1,2 +1,4 @@
 pandas==2.3.3
 torch==2.9.1
+evaluate==0.4.6
+sacrebleu==2.6.0

@@ -15,6 +15,7 @@ class EncoderBlock(nn.Module):
         self.residuals = nn.ModuleList([ResidualLayer(config) for _ in range(2)])
 
     def forward(self, x: Tensor, mask: Tensor) -> Tensor:
+        '''Process the input tokens using a multi-head attention block and a feed-forward block.'''
         # The first residual will need to call Norm(x + Dropout(Attention(x, mask)))
         x = self.residuals[0](x, lambda x: self.attention_block(x, x, x, mask))
         # The second residual will call Norm(x + Dropout(FFN(x)))
@@ -29,6 +30,7 @@ class Encoder(nn.Module):
         self.norm = LayerNorm(config["D_MODEL"], config["EPS"])
 
     def forward(self, x: Tensor, mask: Tensor) -> Tensor:
+        '''Encode the input tokens using a stack of encoder blocks.'''
         for layer in self.encoder_layers:
             x = layer(x, mask)
         return self.norm(x)

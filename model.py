@@ -7,7 +7,7 @@ from encoder import Encoder
 from decoder import Decoder
 from layers import LinearLayer
 
-class TinyGPT(nn.Module):
+class TinyLM(nn.Module):
     def __init__(self, config: Dict) -> None:
         super().__init__()
         self.cfg = config
@@ -18,14 +18,17 @@ class TinyGPT(nn.Module):
         self.decoder = Decoder(config)
 
     def encode(self, x: Tensor, source_mask: Tensor) -> Tensor:
+        '''Perform a forward pass through the Transformer encoder, returning the encoder output.'''
         xEmbeddings = self.embedding.forward(x)
         encoder_out = self.encoder.forward(xEmbeddings, source_mask)
         return encoder_out
 
     def decode(self, y: Tensor, source_mask: Tensor, target_mask: Tensor, encoder_out: Tensor) -> Tensor:
+        '''Perform a forward pass through the Transformer decoder, returning the decoder output.'''
         yEmbeddings = self.embedding.forward(y)
         decoder_out = self.decoder.forward(yEmbeddings, source_mask, target_mask, encoder_out)
         return decoder_out
 
     def linear_projection(self, x: Tensor) -> Tensor:
+        '''Project the decoder's output to the vocabulary dimension to produce logits.'''
         return self.linear_layer.forward(x)

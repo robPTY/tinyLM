@@ -21,6 +21,7 @@ class MultiHeadAttention(nn.Module):
         self.dropout = nn.Dropout(config["DROPOUT"])
 
     def forward(self, q: Tensor, k: Tensor, v: Tensor, mask: Tensor) -> Tensor:
+        '''Project inputs into multiple heads, and compute attention scores with optional masking.'''
         batch, q_len, d_emb = q.shape  # (B, T, D)
         k_len = k.shape[1]
         v_len = v.shape[1]
@@ -63,6 +64,7 @@ class LayerNorm(nn.Module):
         self.bias = nn.Parameter(torch.zeros(d_model))  # Gets added to xj
 
     def forward(self, x: Tensor) -> Tensor:
+        '''Normalize input tensor using mean and variance, then scale + shift with learnable parameters.'''
         mean = x.mean(dim=-1, keepdim=True)
         variance = x.std(dim=-1, unbiased=False, keepdim=True)
         return self.alpha * (x - mean) / torch.sqrt(variance + self.eps) + self.bias
@@ -76,6 +78,7 @@ class ResidualLayer(nn.Module):
         self.norm = LayerNorm(config["D_MODEL"], config["EPS"])
 
     def forward(self, x: Tensor, sublayer: nn.Module) -> Tensor:
+        '''Execute the Pre-Norm residual connection logic: Norm(x + Dropout(Sublayer(x))).'''
         return self.norm(x + self.dropout(sublayer(x)))
 
 class LinearLayer(nn.Module):
@@ -87,6 +90,7 @@ class LinearLayer(nn.Module):
         self.projection = nn.Linear(config["D_MODEL"], config["EMBEDDING_SIZE"])
 
     def forward(self, x: Tensor) -> Tensor:
+        '''Perform a linear transformation to project the input tensor to the output embedding space.'''
         return self.projection(x) # (B, T, D) x (D, V) -> (B, T, V)
 
 class FeedForwardBlock(nn.Module):
@@ -98,6 +102,7 @@ class FeedForwardBlock(nn.Module):
         self.dropout = nn.Dropout(config["DROPOUT"])
 
     def forward(self, x: Tensor) -> Tensor:
+        '''Processes inputs through a d_model -> d_ff -> d_model transformation with a non-linear activation.'''
         # shape of x: (B, T, D)
         xforward = self.W1(x)  # (B, T, D) x (D, DFF) -> (B, T, DFF)
         relud = torch.relu(xforward)

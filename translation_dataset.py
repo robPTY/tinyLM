@@ -16,6 +16,7 @@ class TranslationDataset(Dataset):
         return len(self.X)
 
     def __getitem__(self, index: int) -> Tuple[List[int], List[int]]:
+        '''Return a tuple of tokenized input and output sequences'''
         xTokens = self.tokenizer.encode(self.X.iloc[index])
         yTokens = self.tokenizer.encode(self.Y.iloc[index])
         return xTokens, yTokens

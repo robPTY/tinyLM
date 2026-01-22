@@ -23,7 +23,7 @@ So far, not too shabby considered that in Vaswani et al. their highest BLEU was 
 Run it yourself:
 
 ```bash
-python eval_bleu.py --ckpt weights/tinyLM_bs16_lr1e-4_layers6.pt --limit 200
+python -m evals.eval_bleu.py --ckpt weights/tinyLM_bs16_lr1e-4_layers6.pt --limit 200
 ```
 
 Notes:

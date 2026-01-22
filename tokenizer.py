@@ -3,7 +3,7 @@ import pandas as pd
 from typing import List, Tuple, Dict
 
 class Tokenizer:
-    def __init__(self, vocab_size: int):
+    def __init__(self, vocab_size: int) -> None:
         self.byte_length = 256
         self.vocab_size = vocab_size
         self.BOS = self.vocab_size
@@ -12,7 +12,8 @@ class Tokenizer:
         self.tokens = []
         self.merges = {}
 
-    def get_vocab(self):
+    def get_vocab(self) -> Dict[int, bytes]:
+        '''Return a dictionary mapping token IDs to their corresponding bytes.'''
         vocab = {i: bytes([i]) for i in range(256)}
         if len(self.merges) > 0:
             for (p0, p1), index in self.merges.items():
@@ -20,6 +21,7 @@ class Tokenizer:
         return vocab
 
     def tokenize(self, X: pd.Series) -> List[List[int]]:
+        '''Train BPE tokenizer by merging most frequent pairs.'''
         assert self.vocab_size >= 256
         merges = {}
         merge_count = self.vocab_size - self.byte_length
@@ -28,7 +30,7 @@ class Tokenizer:
             pairs = self.get_pairs(tokens)
             if not pairs:
               break
-            top_pair = max(pairs, key=pairs.get)
+            top_pair = max(pairs.items(), key=lambda x: (x[1], x[0]))[0]
             next_id = i + 256
             tokens = self.merge(tokens, top_pair, next_id)
             merges[top_pair] = i + self.byte_length
@@ -38,6 +40,7 @@ class Tokenizer:
         return tokens
 
     def bpe(self, X: pd.Series) -> List[List[int]]:
+        '''Tokenize a series of sentences using Byte Pair Encoding.'''
         tokens = []
         for sentence in X:
             x = [self.BOS] + list(map(int, sentence.encode('utf-8'))) + [self.EOS]
@@ -45,6 +48,7 @@ class Tokenizer:
         return tokens
 
     def get_pairs(self, tokens: List[List[int]]) -> Dict[Tuple, int]:
+        '''Return a dictionary of token pairs and their frequencies.'''
         pairs = {}
         for x in tokens:
             content = x[1:-1]
@@ -54,6 +58,7 @@ class Tokenizer:
         return pairs
 
     def merge(self, tokens: List[List[int]], pair: Tuple[int, int], new_id: int) -> List[List[int]]:
+        '''Return a new corpus with merged token pairs given a pair and new ID.'''
         new_corpus = []
         for sentence in tokens:
           new_sentence = []
@@ -69,6 +74,7 @@ class Tokenizer:
         return new_corpus
 
     def encode(self, text: str) -> List[int]:
+        '''Encode a string into a list of token IDs.'''
         if not text:
             return []
 
@@ -80,12 +86,14 @@ class Tokenizer:
         return corpus[0]
 
     def decode(self, tokens: List[int]) -> str:
+        '''Decode a list of token IDs into a string.'''
         vocab = self.get_vocab()
         to_decode = b"".join(vocab.get(token, b'') for token in tokens if token < self.vocab_size)
         text = to_decode.decode('utf-8', errors="replace")
         return text
 
     def save(self, file_path: str) -> None:
+        '''Save the tokenizer and merges to a file.'''
         merges_list = []
 
         # Create a list of all merges
@@ -105,6 +113,7 @@ class Tokenizer:
             json.dump(data, f, indent=2)
 
     def load(self, file_path: str) -> None:
+        '''Load the tokenizer (mainly the merges) from a file.'''
         with open(file_path, 'r') as f:
             data = json.load(f)
 

@@ -12,6 +12,7 @@ class DecoderBlock(nn.Module):
         self.residuals = nn.ModuleList([ResidualLayer(config) for _ in range(3)])
 
     def forward(self, x: Tensor, source_mask: Tensor, target_mask: Tensor, encoder_output: Tensor) -> Tensor:
+        '''Process input through masked self-attention, encoder-decoder cross-attention, and feed-forward sub-layers with residual connections.'''
         # First residual will be of Norm(x + Dropout(Masked_MHA(x, mask)))
         x = self.residuals[0](x, lambda x: self.masked_attention(x, x, x, target_mask))
         # Second residual will be of Norm(x + Dropout(MHA(x, mask))) with encoder output as q and k
@@ -27,6 +28,7 @@ class Decoder(nn.Module):
         self.norm = LayerNorm(config["D_MODEL"], config["EPS"])
 
     def forward(self, x: Tensor, source_mask: Tensor, target_mask: Tensor, encoder_output: Tensor) -> Tensor:
+        '''Passes the input through the sequence of decoder blocks.'''
         for layer in self.decoder_layers:
             x = layer(x, source_mask, target_mask, encoder_output)
         return self.norm(x)

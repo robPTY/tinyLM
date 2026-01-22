@@ -1,18 +1,18 @@
 import torch
 
 import config
-from model import TinyGPT
+from model import TinyLM
 from tokenizer import Tokenizer
 
 
 def make_src_mask(src_ids: torch.Tensor) -> torch.Tensor:
-    # src_ids: (1, T)
-    return (src_ids != tokenizer.PAD).unsqueeze(1).unsqueeze(2)
+    '''Create a mask for the source sequence.'''
+    return (src_ids != tokenizer.PAD).unsqueeze(1).unsqueeze(2)  # src_ids: (1, T)
 
 
 def make_tgt_mask(tgt_ids: torch.Tensor) -> torch.Tensor:
-    # tgt_ids: (1, T)
-    tgt_len = tgt_ids.size(1)
+    '''Create a mask for the target sequence.'''
+    tgt_len = tgt_ids.size(1)  # tgt_ids: (1, T)
     pad_mask = (tgt_ids != tokenizer.PAD).unsqueeze(1).unsqueeze(2)  # (1,1,1,T)
     causal = torch.tril(torch.ones((tgt_len, tgt_len), device=tgt_ids.device, dtype=torch.bool))
     return pad_mask & causal  # (1,1,T,T)
@@ -20,6 +20,7 @@ def make_tgt_mask(tgt_ids: torch.Tensor) -> torch.Tensor:
 
 @torch.no_grad()
 def translate(text: str, max_len: int = 60) -> str:
+    '''Return the translated text using TinyLM'''
     model.eval()
 
     src_ids = tokenizer.encode(text)
@@ -50,7 +51,7 @@ if __name__ == "__main__":
     tokenizer = Tokenizer(vocab_size=config.TOTAL_VOCAB_SIZE)
     tokenizer.load("tokenizer_weights.json")
 
-    model = TinyGPT(config=config.TinyGPT_Config).to(device)
+    model = TinyLM(config=config.TinyLM_Config).to(device)
 
     # Load last checkpoint (or best one so far)
     ckpt = torch.load("weights/tinyLM_bs16_lr1e-4_layers6.pt", map_location=device)

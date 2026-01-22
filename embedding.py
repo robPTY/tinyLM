@@ -13,6 +13,7 @@ class Embedding(nn.Module):
         self.dropout = nn.Dropout(dropout)  # For positional encodings
 
     def get_positional_embeddings(self, T: int, device: torch.device, dtype: torch.dtype) -> Tensor:
+        '''Create positional embeddings for the given sequence length.'''
         # (T, 1)
         positions = torch.arange(T, device=device, dtype=dtype).unsqueeze(1)
 
@@ -28,6 +29,7 @@ class Embedding(nn.Module):
         return pe  # (T, 512)
 
     def forward(self, x: Tensor) -> Tensor:
+        '''Embed the input tokens and add positional encodings.'''
         # Manuscript multiplies weights by sqrt(d_model)
         embedding = self.We(x) * math.sqrt(self.d_model)
 

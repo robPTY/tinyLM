@@ -2,7 +2,7 @@
 FILE_PATH = "data/eng_to_spa.txt"
 
 # Model Config
-TinyGPT_Config = {
+TinyLM_Config = {
     "VOCAB_SIZE": 8000,
     "EMBEDDING_SIZE": 8003,
     "D_MODEL": 512,
